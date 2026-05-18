@@ -5,7 +5,7 @@ A compiler and stack-based interpreter for a small statically-typed imperative l
 
 ## Running it
 
-Requires Python 3.10+.
+Requires Python 3.10.
 
 ```bash
 pip install -r requirements.txt
@@ -13,70 +13,84 @@ pip install -r requirements.txt
 
 Compile a source file to bytecode:
 ```bash
-python compiler.py <source_file> <compiled_file>
+python compiler.py  
 ```
 
 Run the bytecode:
 ```bash
-python interpreter.py <compiled_file>
+python interpreter.py 
 ```
 
 Example programs live in [`samples/`](./samples/).
 
 
-## The language
+## Language Specification
 
-Statically typed, four primitive types: `int`, `float`, `bool`, `string`. Variables must be declared before use and are zero-initialized (`0`, `0.0`, `false`, `""`).
+### Program Structure
+
+- A program is a sequence of commands.
+- Formatting (whitespace, comments, etc.) does not affect the meaning of the program.
+- Comments are denoted by `//` and continue to the end of the line.
+
+### Literals
+
+- **int**: A sequence of digits (e.g., `123`).
+- **float**: A sequence of digits containing a `.` (e.g., `12.34`).
+- **bool**: `true` or `false`.
+- **string**: Text enclosed in double quotation marks (e.g., `"hello"`).
+
+### Variables
+
+- Variables must be declared before use.
+- Types: `int`, `float`, `bool`, `string`.
+- Initial values: `0` for `int`, `0.0` for `float`, `false` for `bool`, and `""` for `string`.
 
 ### Statements
 
-- **Declaration** — `type var1, var2, ...;`
-- **Assignment / expression** — evaluated and discarded (assignment is an expression)
-- **I/O** — `read var1, ...;` and `write expr1, ...;`
-- **Block** — `{ stmt1 stmt2 ... }`
-- **Conditional** — `if (cond) stmt [else stmt]`
-- **Loops** — `while (cond) stmt` and `for (init; cond; step) stmt`
+- **Declaration**: `type variable1, variable2, ...;`
+- **Expression**: Evaluates the expression and discards the result (side effects like variable assignment possible).
+- **Input**: `read variable1, variable2, ...;`
+- **Output**: `write expression1, expression2, ...;`
+- **Block**: `{ statement1 statement2 ... }`
+- **Conditional**: `if (condition) statement [else statement]`
+- **Loop**: `while (condition) statement`
+- **For loop**: `for (expression; condition; expression) statement`
 
-Comments are `// ...` to end of line. Whitespace is insignificant.
+### Expressions
 
-### Operators
-
-| Category | Operators |
-| --- | --- |
-| Arithmetic | `+` `-` `*` `/` `%` |
-| String | `.` (concatenation) |
-| Relational | `<` `>` |
-| Equality | `==` `!=` |
-| Logical | `&&` `\|\|` `!` |
-| Unary | `-` `!` |
-| Assignment | `=` |
-
-
-## Sample programs
-
-| File | Demonstrates |
-| --- | --- |
-| `first.lang` | Variables, expressions, I/O, multiple assignment |
-| `second.lang` | Relational and logical operators |
-| `third.lang` | `if`, `while`, `for` |
-| `expressions.lang` | Complex expressions and type conversion |
-| `errors.lang` | Syntax and type errors (rejected by the compiler) |
-| `centroids.lang` | Centroid of a set of points |
-| `primes.lang` | Prime number generation |
+- **Unary Operators**: `-` (negation), `!` (logical NOT)
+- **Binary Operators**:
+  - Arithmetic: `+`, `-`, `*`, `/`, `%`
+  - String concatenation: `.`
+  - Relational: `<`, `>`
+  - Equality: `==`, `!=`
+  - Logical: `&&`, `||`
+  - Assignment: `=`
 
 
-## Bytecode
+## Sample Programs
 
-Stack-based instruction set produced by the compiler:
+The [`samples`](./samples/) directory contains several example programs testing and demonstrating various features of the language:
 
-| Category | Instructions |
-| --- | --- |
-| Arithmetic | `add` `sub` `mul` `div` `mod` |
-| Unary | `uminus` `not` `itof` (int → float coercion) |
-| String | `concat` |
-| Logical | `and` `or` |
-| Relational | `gt` `lt` |
-| Equality | `eq` |
-| Stack | `push <type> <value>` `pop` `load <id>` `save <id>` |
-| Control flow | `label <n>` `jmp <n>` `fjmp <n>` (jump if false) |
-| I/O | `print <n>` `read <type>` |
+- `first.lang`: Demonstrates constants, variables, expressions, input/output, and multiple assignments.
+- `second.lang`: Demonstrates relational and logical operators.
+- `third.lang`: Demonstrates if statements, while loops, and for loops.
+- `expressions.lang`: Complex expressions and type conversions.
+- `errors.lang`: Examples of syntax and type errors.
+- `centroids.lang`: Calculates the centroid of points.
+- `primes.lang`: Calculates prime numbers and a "prime string".
+
+
+## Instruction Set
+
+The compiler generates a stack-based instruction set that the interpreter executes. Below are the instructions:
+
+- **Arithmetic**: `add`, `sub`, `mul`, `div`, `mod`
+- **Unary Operations**: `uminus`, `not`, `itof`
+- **String Concatenation**: `concat`
+- **Logical**: `and`, `or`
+- **Relational**: `gt` (greater than), `lt` (less than)
+- **Equality**: `eq` (equal)
+- **Stack Manipulation**: `push <type> <x>`, `pop`, `load <id>`, `save <id>`
+- **Control Flow**: `label <n>`, `jmp <n>`, `fjmp <n>`
+- **Input/Output**: `print <n>`, `read <type>`
