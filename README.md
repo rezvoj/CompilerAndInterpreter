@@ -1,125 +1,82 @@
-# FEI VSB-TUO: Programming Languages and Compilers
+# FEI VSB-TUO: PLC
+![Python](https://img.shields.io/badge/python-3.10-blue) ![ANTLR4](https://img.shields.io/badge/ANTLR-4-orange)
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg) ![Python Version](https://img.shields.io/badge/python-3.10-blue)
+A compiler and stack-based interpreter for a small statically-typed imperative language. The compiler parses source code (ANTLR4-generated grammar), performs type checking, and emits stack-machine instructions; the interpreter executes them.
 
-## Table of Contents
+## Running it
 
-- [Introduction](#introduction)
-- [Dependencies](#dependencies)
-- [Usage](#usage)
-- [Language Specification](#language-specification)
-- [Sample Programs](#sample-programs)
-- [Instruction Set](#instruction-set)
-- [License](#license)
+Requires Python 3.10+.
 
-## Introduction
-
-This project implements a compiler and interpreter for a simple programming language. The compiler is responsible for parsing the input code, performing type checking, and generating stack-based instructions. The interpreter then reads and executes these instructions. The project is written in Python 3.10 and uses the ANTLR4 parser generator.
-
-## Dependencies
-
-Ensure you're using Python version 3.10 or higher.
-
-Install the required dependencies with:
 ```bash
 pip install -r requirements.txt
 ```
 
-Dependencies used:
-- ANTLR4 Python runtime (`antlr4-python3-runtime`)
-
-## Usage
-
-### Compiling a Program
-
-To compile a program, run the `compiler.py` script with the source code file as input:
-
+Compile a source file to bytecode:
 ```bash
 python compiler.py <source_file> <compiled_file>
 ```
 
-- `<source_file>`: The path to the source code file you want to compile.
-- `<compiled_file>`: The path where the compiled instructions will be saved.
-
-### Interpreting a Compiled Program
-
-To interpret the compiled program, run the `interpreter.py` script with the compiled file as input:
-
+Run the bytecode:
 ```bash
 python interpreter.py <compiled_file>
 ```
 
-- `<compiled_file>`: The path to the compiled instructions file.
+Example programs live in [`samples/`](./samples/).
 
-## Language Specification
 
-### Program Structure
+## The language
 
-- A program is a sequence of commands.
-- Formatting (whitespace, comments, etc.) does not affect the meaning of the program.
-- Comments are denoted by `//` and continue to the end of the line.
-
-### Literals
-
-- **int**: A sequence of digits (e.g., `123`).
-- **float**: A sequence of digits containing a `.` (e.g., `12.34`).
-- **bool**: `true` or `false`.
-- **string**: Text enclosed in double quotation marks (e.g., `"hello"`).
-
-### Variables
-
-- Variables must be declared before use.
-- Types: `int`, `float`, `bool`, `string`.
-- Initial values: `0` for `int`, `0.0` for `float`, `false` for `bool`, and `""` for `string`.
+Statically typed, four primitive types: `int`, `float`, `bool`, `string`. Variables must be declared before use and are zero-initialized (`0`, `0.0`, `false`, `""`).
 
 ### Statements
 
-- **Declaration**: `type variable1, variable2, ...;`
-- **Expression**: Evaluates the expression and discards the result (side effects like variable assignment possible).
-- **Input**: `read variable1, variable2, ...;`
-- **Output**: `write expression1, expression2, ...;`
-- **Block**: `{ statement1 statement2 ... }`
-- **Conditional**: `if (condition) statement [else statement]`
-- **Loop**: `while (condition) statement`
-- **For loop**: `for (expression; condition; expression) statement`
+- **Declaration** — `type var1, var2, ...;`
+- **Assignment / expression** — evaluated and discarded (assignment is an expression)
+- **I/O** — `read var1, ...;` and `write expr1, ...;`
+- **Block** — `{ stmt1 stmt2 ... }`
+- **Conditional** — `if (cond) stmt [else stmt]`
+- **Loops** — `while (cond) stmt` and `for (init; cond; step) stmt`
 
-### Expressions
+Comments are `// ...` to end of line. Whitespace is insignificant.
 
-- **Unary Operators**: `-` (negation), `!` (logical NOT)
-- **Binary Operators**:
-  - Arithmetic: `+`, `-`, `*`, `/`, `%`
-  - String concatenation: `.`
-  - Relational: `<`, `>`
-  - Equality: `==`, `!=`
-  - Logical: `&&`, `||`
-  - Assignment: `=`
+### Operators
 
-## Sample Programs
+| Category | Operators |
+| --- | --- |
+| Arithmetic | `+` `-` `*` `/` `%` |
+| String | `.` (concatenation) |
+| Relational | `<` `>` |
+| Equality | `==` `!=` |
+| Logical | `&&` `\|\|` `!` |
+| Unary | `-` `!` |
+| Assignment | `=` |
 
-The [`samples`](./samples/) directory contains several example programs testing and demonstrating various features of the language:
 
-- `first.lang`: Demonstrates constants, variables, expressions, input/output, and multiple assignments.
-- `second.lang`: Demonstrates relational and logical operators.
-- `third.lang`: Demonstrates if statements, while loops, and for loops.
-- `expressions.lang`: Complex expressions and type conversions.
-- `errors.lang`: Examples of syntax and type errors.
-- `centroids.lang`: Calculates the centroid of points.
-- `primes.lang`: Calculates prime numbers and a "prime string".
+## Sample programs
 
-## Instruction Set
+| File | Demonstrates |
+| --- | --- |
+| `first.lang` | Variables, expressions, I/O, multiple assignment |
+| `second.lang` | Relational and logical operators |
+| `third.lang` | `if`, `while`, `for` |
+| `expressions.lang` | Complex expressions and type conversion |
+| `errors.lang` | Syntax and type errors (rejected by the compiler) |
+| `centroids.lang` | Centroid of a set of points |
+| `primes.lang` | Prime number generation |
 
-The compiler generates a stack-based instruction set that the interpreter executes. Below are the instructions:
 
-- **Arithmetic**: `add`, `sub`, `mul`, `div`, `mod`
-- **Unary Operations**: `uminus`, `not`, `itof`
-- **String Concatenation**: `concat`
-- **Logical**: `and`, `or`
-- **Relational**: `gt` (greater than), `lt` (less than)
-- **Equality**: `eq` (equal)
-- **Stack Manipulation**: `push <type> <x>`, `pop`, `load <id>`, `save <id>`
-- **Control Flow**: `label <n>`, `jmp <n>`, `fjmp <n>`
-- **Input/Output**: `print <n>`, `read <type>`
+## Bytecode
 
-## License
+Stack-based instruction set produced by the compiler:
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+| Category | Instructions |
+| --- | --- |
+| Arithmetic | `add` `sub` `mul` `div` `mod` |
+| Unary | `uminus` `not` `itof` (int → float coercion) |
+| String | `concat` |
+| Logical | `and` `or` |
+| Relational | `gt` `lt` |
+| Equality | `eq` |
+| Stack | `push <type> <value>` `pop` `load <id>` `save <id>` |
+| Control flow | `label <n>` `jmp <n>` `fjmp <n>` (jump if false) |
+| I/O | `print <n>` `read <type>` |
